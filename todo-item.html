@@ -1,0 +1,90 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-input/paper-input.html">
+
+<polymer-element name="todo-item" attributes="checked active">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 5px 0px;
+      }
+
+      paper-checkbox {
+        margin-right:  8px;
+      }
+
+      .checked {
+        text-decoration: line-through;
+        color: #999;
+        font-style: italic;
+      }
+
+      span {
+        vertical-align: top;
+      }
+
+      paper-input /deep/ #decorator {
+        padding: 0; /* remove auto padding */
+      }
+    </style>
+
+    <!-- Display text field for inactive todo items --> 
+    <template if="{{!active}}">
+      <li>
+        <paper-input on-keydown="{{addTodoOnEnter}}" label="New todo"></paper-input>
+      </li>      
+    </template>
+
+    <!-- Display todo title for active todo items --> 
+    <template if="{{active}}">
+      <li>
+        <paper-checkbox checked="{{checked}}"></paper-checkbox>
+        <span class="{{isChecked(checked)}}"><content></content></span>
+      </li>     
+    </template> 
+    
+  </template>
+  <script>
+
+      Polymer('todo-item', {
+        /**
+         * Active represents whether the todo item is live yet.
+         * @type {Boolean}
+         */
+        active: true,
+
+        /**
+         * Checked represents whether or not the item is marked completed.
+         * @type {Boolean}
+         */
+        checked: false,
+        
+        /**
+         * isChecked returns 'checked' if the todo is checked. 
+         * @param  {Boolean}  
+         * @return {String}   
+         */
+        isChecked: function(checked){
+          if (checked){
+            return 'checked';
+          }
+          return '';
+        },
+
+        /**
+         * addTodoOnEnter is an event handler for on-key-press and fires a todo-add event on `enter`.
+         */
+        addTodoOnEnter: function (e, detail, sender) {
+          // Check if `enter` was pressed
+          if (e.keyCode === 13) {
+            // If so, fire event with todo info and reset field.
+            this.fire('todo-add', {title: sender.value, checked: false});
+            sender.value = null;
+          }
+        }
+      })
+       
+  </script>
+</polymer-element>

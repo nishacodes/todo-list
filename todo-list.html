@@ -1,0 +1,129 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="todo-item.html">
+
+<polymer-element name="todo-list" attributes="items showCompleted baseRoute listId">
+
+  <template>
+    <style>
+      :host {
+        font-family: sans-serif;
+        font-size: 12pt;
+      }
+
+      ul {
+        list-style: none;
+        margin: 30px 0px;
+      }
+
+      .completed {
+        font-style: italic;
+      }
+
+      paper-button {
+        background-color: #eee;
+        font-size: 10pt;
+        margin-left: 40px;
+      }
+    </style>
+
+    <!-- AJAX component for saving to DB --> 
+    <!-- 'auto' attribute sends request any time url or body changes --> 
+    <core-ajax method="POST" auto url="{{baseRoute}}{{listId}}" body="{{items}}" handleAs="json" on-core-response="{{_handleResponse}}"></core-ajax>
+
+    <!-- Clear completed button --> 
+    <paper-button on-click="{{clearCompletedItems}}">Clear Completed</paper-button>
+
+    <ul>  
+      <!-- List of todos --> 
+      <template repeat="{{item in items}}">
+          <todo-item checked="{{item.checked}}">{{item.title}}</todo-item>
+      </template>
+
+      <!-- Field to add new todo --> 
+      <todo-item active="false"></todo-item>
+    </ul>
+      
+    <!-- List of completed todos (optional) --> 
+    <template if="{{showCompleted && _completedItems && _completedItems.length}}">
+      <ul class="completed"> Completed Items
+        <template repeat="{{item in _completedItems}}">
+          <todo-item checked="{{item.checked}}">{{item.title}}</todo-item>
+        </template>
+      </ul>
+    </template>  
+
+  </template>
+  <script>
+
+      Polymer('todo-list', {
+
+        /**
+         * A list of todo items the list initializes with.
+         * @type {Array}
+         */
+        items: [
+          { title: 'Todo 1', checked: false },
+          { title: 'Todo 2', checked: false },
+          { title: 'Todo 3', checked: false }
+        ],
+
+        /**
+         * If true, displays completed items as a separate list
+         * @type {Boolean}
+         */
+        showCompleted: false,
+
+        /**
+         * Base route for where lists are saved.
+         * @type {String}
+         */
+        baseRoute: "lists/",
+
+        /**
+         * Unique ID parameter for this particular list.
+         * @type {String}
+         */
+        listId: "1",
+
+        /**
+         * A list of completed items as a temporary store in case user wants to restore any.
+         * @type {Array}
+         */
+        _completedItems: [],
+
+        /**
+         * Lifecycle method that is called when component is ready in the document.
+         */
+        ready: function(){
+          this.addEventListener('todo-add', function(e){
+            this.items.push(e.detail);            
+          }.bind(this));
+        },
+
+        /**
+         * Clears completed items from the list and stores them in _completedItems array
+         */
+        clearCompletedItems: function(){
+          var self = this;
+          this.items = this.items.filter(function(item, i){
+            if (item.checked){
+              self._completedItems.push(item);
+              return false;
+            } else {
+              return true;
+            }
+          })
+        },
+
+        /**
+         * Receives response from POST request and displays status.
+         */
+        _handleResponse: function(res){
+          // This is a handler for the core-ajax response. 
+          // We can display a save confirmation or an error message based on the response.
+        }
+      })
+
+  </script>
+</polymer-element>

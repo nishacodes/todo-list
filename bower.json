@@ -1,0 +1,13 @@
+{
+  "name": "todo-list",
+  "version": "0.0.0",
+  "main": "todo-list.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.1",
+    "core-icon": "Polymer/core-icon#~0.5.1",
+    "core-ajax": "Polymer/core-ajax#~0.5.1",
+    "paper-checkbox": "Polymer/paper-checkbox#~0.5.1",
+    "paper-input": "Polymer/paper-input#~0.5.1",
+    "paper-button": "Polymer/paper-button#~0.5.1"
+  }
+}
